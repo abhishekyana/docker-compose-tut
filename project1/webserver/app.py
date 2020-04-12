@@ -1,21 +1,31 @@
 import os
 from flask import Flask, request, jsonify
+from flask_cors import CORS
 
 from TASKER import tasker
 
 import redis
 from rq import Queue
 
+import numpy as np
+
 app = Flask(__name__)
 
 r = redis.Redis('redis_server')
 q = Queue(connection=r)
+
+# enable CORS
+CORS(app, resources={r'/*': {'origins': '*'}})
 
 g = 0
 
 @app.route("/")
 def hello():
     return "Hello World!!!!!!! This is abhishek yanamandra"
+
+@app.route("/ping")
+def ping():
+    return "PONG!!"+str(np.random.randint(0,2000))
 
 @app.route("/maketask")
 def maketask():
