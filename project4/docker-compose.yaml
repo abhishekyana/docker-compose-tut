@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  webserver_service:
+    build: ./webserver
+    image: webserver_service
+    container_name: webserver_service
+    volumes:
+      - ./webserver:/app
+      - ./DATA:/app/DATA
+      - ./DATA2:/app/DATA2
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis_server
+    networks:
+      - server_client_nw
+      - server_redis_nw
+  worker:
+    image: webserver_service
+    container_name: webworker_service
+    command: python redis_worker.py
+    volumes:
+    - ./webserver:/app
+    - ./DATA:/app/DATA
+    - ./DATA2:/app/DATA2
+    depends_on:
+      - redis_server
+    networks:
+      - server_redis_nw
+  client_service:
+    build: ./client
+    image: client_service
+    container_name: client_service
+    volumes:
+      - ./client:/app
+    ports:
+      - 5001:5001
+    depends_on:
+      - redis_server
+  vue_service:
+    build: ./VueClient
+    image: vue_service
+    container_name: vue_service
+    # command: npm run serve
+    # volumes:
+    #   - ./VueClient/src/components:/app/src/components
+    ports:
+      - 8080:80
+    depends_on:
+      - redis_server
+    networks:
+      - server_client_nw
+  redis_server:
+    image: redis:5.0.7-alpine
+    container_name: redis_server
+    ports:
+      - 6379:6379
+    networks:
+      - server_redis_nw
+networks:
+    server_client_nw:
+      driver: bridge
+    server_redis_nw:
+      driver: bridge

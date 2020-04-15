@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  webserver_service:
+    build: ./webserver
+    image: webserver_service
+    container_name: webserver_service
+    ports:
+      - 5000:5000
+    depends_on:
+      - redis_server
+  worker:
+    image: webserver_service
+    container_name: webworker_service
+    command: python /app/redis_worker.py
+    volumes:
+    - ./prodserver/app:/app/app
+    depends_on:
+      - redis_server
+  vue_service:
+    build: ./client
+    image: vue_service
+    container_name: vue_service
+    ports:
+      - 8080:80
+    depends_on:
+      - redis_server
+  redis_server:
+    image: redis:5.0.7-alpine
+    container_name: redis_server
+    ports:
+      - 6379:6379

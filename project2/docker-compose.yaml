@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+  production_server:
+    build: ./production_server
+    image: production_server
+    container_name: production_server
+    volumes:
+      - ./prodserver/app:/app/app
+      - ./DATA:/app/app/DATA
+      - ./DATA2:/app/app/DATA2
+    ports:
+      - 5000:80
+    depends_on:
+      - redis_server2
+    networks:
+      - server_client_nw
+      - server_redis_nw
+  production_worker:
+    build: ./production_worker
+    container_name: production_worker
+    command: python redis_worker.py
+    volumes:
+    - ./production_worker:/app
+    - ./DATA:/app/DATA
+    - ./DATA2:/app/DATA2
+    depends_on:
+      - redis_server2
+    networks:
+      - server_redis_nw
+  vue_service:
+    build: ./VueClient
+    image: vue_service
+    container_name: vue_service
+    ports:
+      - 8080:80
+    depends_on:
+      - redis_server2
+    networks:
+      - server_client_nw
+  redis_server2:
+    image: redis:5.0.7-alpine
+    container_name: redis_server2
+    ports:
+      - 6379:6379
+    networks:
+      - server_redis_nw
+networks:
+    server_client_nw:
+      driver: bridge
+    server_redis_nw:
+      driver: bridge

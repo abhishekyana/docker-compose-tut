@@ -25,7 +25,7 @@ def hello():
 
 @app.route("/ping")
 def ping():
-    return "PONG!!!!!!!"+str(np.random.randint(0,2000))
+    return "PONG!!!!!!!"+str(np.random.randint(0, 2000))
 
 @app.route("/maketask")
 def maketask():
