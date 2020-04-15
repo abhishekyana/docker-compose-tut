@@ -39,12 +39,9 @@ services:
     depends_on:
       - redis_server
   vue_service:
-    build: ./VueClient
+    build: ./vue_client
     image: vue_service
     container_name: vue_service
-    # command: npm run serve
-    # volumes:
-    #   - ./VueClient/src/components:/app/src/components
     ports:
       - 8080:80
     depends_on:
